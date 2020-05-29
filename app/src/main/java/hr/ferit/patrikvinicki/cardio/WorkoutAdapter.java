@@ -1,18 +1,21 @@
 package hr.ferit.patrikvinicki.cardio;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.ViewHolder> {
     private ArrayList<Workout> workouts;
+    private static ViewHolder.ClickListener clickListener;
 
     public WorkoutAdapter(ArrayList<Workout> workouts){
         this.workouts = workouts;
@@ -43,14 +46,37 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.ViewHold
         return this.workouts.size();
     }
 
-    public static class ViewHolder extends  RecyclerView.ViewHolder{
+    public static class ViewHolder extends  RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         public TextView tvWorkoutName;
         public TextView tvWorkoutTime;
 
         public ViewHolder(View itemView){
             super(itemView);
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
             this.tvWorkoutName = (TextView) itemView.findViewById(R.id.tvWorkoutName);
             this.tvWorkoutTime = (TextView) itemView.findViewById(R.id.tvWorkoutTime);
         }
+
+        @Override
+        public void onClick(View view) {
+            clickListener.onItemClick(getAdapterPosition(), view);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            clickListener.onItemLongClick(getAdapterPosition(), view);
+            return false;
+        }
+
+        public interface ClickListener {
+            void onItemClick(int position, View v);
+            void onItemLongClick(int position, View v);
+        }
     }
+
+    public void setOnItemClickListener(ViewHolder.ClickListener clickListener){
+        WorkoutAdapter.clickListener = clickListener;
+    }
+
 }

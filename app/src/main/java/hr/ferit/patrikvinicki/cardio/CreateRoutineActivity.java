@@ -34,6 +34,7 @@ public class CreateRoutineActivity extends AppCompatActivity {
     private WorkoutAdapter mWorkoutAdapter;
     private Bundle bundle;
     static final int GET_WORKOUT = 3;
+    static final int EDIT_WORKOUT = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,20 @@ public class CreateRoutineActivity extends AppCompatActivity {
 
         //populate adapter from db (serialized routine objects)
         this.mWorkoutAdapter = new WorkoutAdapter(workouts);
+
+        this.mWorkoutAdapter.setOnItemClickListener(new WorkoutAdapter.ViewHolder.ClickListener() {
+            @Override
+            public void onItemClick(int position, View v) {
+                intent = new Intent(CreateRoutineActivity.this, CreateWorkoutActivity.class);
+                //get clicked workout
+                startActivityForResult(intent, EDIT_WORKOUT);
+            }
+
+            @Override
+            public void onItemLongClick(int position, View v) {
+                //delete workout
+            }
+        });
 
         //this.rvWorkouts.addItemDecoration(this.mItemDecoration);
         this.rvWorkouts.setLayoutManager(this.mLayoutManager);
@@ -109,6 +124,12 @@ public class CreateRoutineActivity extends AppCompatActivity {
                 //implement something if canceled
             }
         }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        intent.putExtra("requestCode", requestCode);
+        super.startActivityForResult(intent, requestCode);
     }
+}
 
 

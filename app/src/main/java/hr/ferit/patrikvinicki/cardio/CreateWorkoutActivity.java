@@ -83,7 +83,7 @@ public class CreateWorkoutActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(edWorkoutName.getText().toString().isEmpty()){
                     edWorkoutName.setError("Workout name empty");
-                    return;
+
                 } else if (sbSecs.getProgress() != 0 || sbMins.getProgress() != 0){
                     String workoutName = edWorkoutName.getText().toString();
                     int time = (sbSecs.getProgress() + ((sbMins.getProgress() * 60) - 60));
