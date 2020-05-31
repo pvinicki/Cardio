@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHolder> {
     private ArrayList<Routine> routines;
+    private static ViewHolder.ClickListener clickListener;
 
     public RoutineAdapter(ArrayList<Routine> routines){
         this.routines = routines;
@@ -45,7 +46,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHold
         return this.routines.size();
     }
 
-    public static class ViewHolder extends  RecyclerView.ViewHolder{
+    public static class ViewHolder extends  RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
         private TextView tvRoutineName;
         private TextView tvRoutineTime;
         private TextView tvRoutineWorkoutCount;
@@ -53,9 +54,31 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHold
 
         public ViewHolder(View itemView){
             super(itemView);
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
             this.tvRoutineName         = (TextView) itemView.findViewById(R.id.tvRoutineName);
             this.tvRoutineTime         = (TextView) itemView.findViewById(R.id.tvRoutineTime);
             this.tvRoutineWorkoutCount = (TextView) itemView.findViewById(R.id.tvRoutineWorkoutCount);
         }
+
+        @Override
+        public void onClick(View view) {
+            clickListener.onItemClick(this.getLayoutPosition(), view);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            clickListener.onItemLongClick(this.getLayoutPosition(), view);
+            return false;
+        }
+
+        public interface ClickListener {
+            void onItemClick(int position, View v);
+            void onItemLongClick(int position, View v);
+        }
+    }
+
+    public void setOnItemClickListener(ViewHolder.ClickListener clickListener){
+        RoutineAdapter.clickListener = clickListener;
     }
 }

@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -20,6 +22,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class CreateRoutineActivity extends AppCompatActivity {
     private Routine routine;
@@ -33,6 +36,8 @@ public class CreateRoutineActivity extends AppCompatActivity {
     private RecyclerView.ItemDecoration mItemDecoration;
     private WorkoutAdapter mWorkoutAdapter;
     private Bundle bundle;
+    private Workout editWorkout;
+    private AlertDialog.Builder builder;
     static final int GET_WORKOUT = 3;
     static final int EDIT_WORKOUT = 2;
 
@@ -43,6 +48,7 @@ public class CreateRoutineActivity extends AppCompatActivity {
         //routine needs name
         //Routine routine = new Routine();
         setContentView(R.layout.activity_create_routine);
+        builder = new AlertDialog.Builder(this);
         initializeUI();
     }
 
@@ -51,7 +57,6 @@ public class CreateRoutineActivity extends AppCompatActivity {
         this.btnSaveRoutine = (Button) findViewById(R.id.btnSaveRoutine);
 
         Context context = getApplicationContext();
-        workouts.add(new Workout("Test", 20));
         this.rvWorkouts = (RecyclerView) findViewById(R.id.rvWorkouts);
         this.mLayoutManager = new LinearLayoutManager(context);
         this.mItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
@@ -62,14 +67,50 @@ public class CreateRoutineActivity extends AppCompatActivity {
         this.mWorkoutAdapter.setOnItemClickListener(new WorkoutAdapter.ViewHolder.ClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                intent = new Intent(CreateRoutineActivity.this, CreateWorkoutActivity.class);
+                int secs = 0;
+                int mins = 0;
                 //get clicked workout
+                String workoutName = ((TextView) rvWorkouts.findViewHolderForAdapterPosition(position).itemView.findViewById(R.id.tvWorkoutName)).getText().toString();
+                for(Workout workout : workouts){
+                    if(workout.getName().equals(workoutName)){
+                        secs = workout.getSecs();
+                        mins = workout.getMins();
+                        editWorkout = workout;
+                    }
+                }
+                intent = new Intent(CreateRoutineActivity.this, CreateWorkoutActivity.class);
+                intent.putExtra("workoutName", workoutName);
+                intent.putExtra("secs", secs);
+                intent.putExtra("mins", mins);
+
                 startActivityForResult(intent, EDIT_WORKOUT);
             }
 
             @Override
             public void onItemLongClick(int position, View v) {
-                //delete workout
+                final String workoutName = ((TextView) rvWorkouts.findViewHolderForAdapterPosition(position).itemView.findViewById(R.id.tvWorkoutName)).getText().toString();
+                builder.setTitle("Delete selected workout?");
+                builder.setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Iterator<Workout> iterator = workouts.iterator();
+                        while(iterator.hasNext()){
+                            Workout workout = iterator.next();
+                            if(workout.getName().equals(workoutName)){
+                                iterator.remove();
+                            }
+                        }
+                    }
+                });
+                builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                AlertDialog alert = builder.create();
+                alert.show();
             }
         });
 
@@ -108,20 +149,43 @@ public class CreateRoutineActivity extends AppCompatActivity {
     @Override
         protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
-
+            //refactor later
             if (resultCode == Activity.RESULT_OK) {
                 String name;
-                int time;
+                int time, secs, mins;
 
                 name = data.getStringExtra("workoutName");
                 time = data.getIntExtra("time", 1);
+                secs = data.getIntExtra("secs", 0);
+                mins = data.getIntExtra("mins", 0);
 
-                workouts.add(new Workout(name, time));
+                workouts.add(new Workout(name, time, secs, mins));
                 mWorkoutAdapter = new WorkoutAdapter(workouts);
                 rvWorkouts.setAdapter(mWorkoutAdapter);
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 //implement something if canceled
+            } else if (resultCode == 2){
+                String name;
+                int time, secs, mins;
+
+                name = data.getStringExtra("workoutName");
+                time = data.getIntExtra("time", 1);
+                secs = data.getIntExtra("secs", 0);
+                mins = data.getIntExtra("mins", 0);
+                //remove previous workout
+                Iterator<Workout> iterator = workouts.iterator();
+                while(iterator.hasNext()){
+                    Workout workout = iterator.next();
+                    if(workout.getName().equals(editWorkout.getName())){
+                        iterator.remove();
+                    }
+                }
+                //add edited workout
+                workouts.add(new Workout(name, time, secs, mins));
+                mWorkoutAdapter = new WorkoutAdapter(workouts);
+                rvWorkouts.setAdapter(mWorkoutAdapter);
+
             }
         }
 

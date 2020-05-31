@@ -60,12 +60,12 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.ViewHold
 
         @Override
         public void onClick(View view) {
-            clickListener.onItemClick(getAdapterPosition(), view);
+            clickListener.onItemClick(this.getLayoutPosition(), view);
         }
 
         @Override
         public boolean onLongClick(View view) {
-            clickListener.onItemLongClick(getAdapterPosition(), view);
+            clickListener.onItemLongClick(this.getLayoutPosition(), view);
             return false;
         }
 

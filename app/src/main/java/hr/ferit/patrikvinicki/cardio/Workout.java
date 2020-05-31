@@ -8,6 +8,8 @@ import java.sql.Time;
 public class Workout implements Parcelable {
     private String name;
     private int time;
+    private int secs;
+    private int mins;
 
     public String getName() {
         return name;
@@ -25,9 +27,27 @@ public class Workout implements Parcelable {
         this.time = time;
     }
 
-    public Workout(String name, int time){
+    public int getSecs() {
+        return secs;
+    }
+
+    public void setSecs(int secs) {
+        this.secs = secs;
+    }
+
+    public int getMins() {
+        return mins;
+    }
+
+    public void setMins(int mins) {
+        this.mins = mins;
+    }
+
+    public Workout(String name, int time, int secs, int mins){
         this.name = name;
         this.time = time;
+        this.secs = secs;
+        this.mins = mins;
     }
 
     public static final Parcelable.Creator<Workout> CREATOR = new Parcelable.Creator<Workout>() {

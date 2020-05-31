@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -68,6 +69,28 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 intent = new Intent(MainActivity.this, CreateRoutineActivity.class);
                 startActivityForResult(intent, GET_ROUTINE);
+            }
+        });
+
+        this.mRoutineAdapter.setOnItemClickListener(new RoutineAdapter.ViewHolder.ClickListener() {
+            @Override
+            public void onItemClick(int position, View v) {
+                String routineName = ((TextView) rvRoutines.findViewHolderForAdapterPosition(position).itemView.findViewById(R.id.tvRoutineName)).getText().toString();
+                Routine startRoutine;
+                for(Routine routine : routines){
+                    if(routine.getName().equals(routineName)){
+                        startRoutine = routine;
+                        intent = new Intent(MainActivity.this, StartRoutineActivity.class);
+                        intent.putExtra("routineName", startRoutine.getName());
+                        intent.putParcelableArrayListExtra("workouts", startRoutine.getWorkouts());
+                        startActivity(intent);
+                    }
+                }
+            }
+
+            @Override
+            public void onItemLongClick(int position, View v) {
+
             }
         });
     }

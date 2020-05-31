@@ -23,12 +23,16 @@ public class CreateWorkoutActivity extends AppCompatActivity {
     private SeekBar  sbMins;
     private FloatingActionButton fabSaveWorkout;
     private Intent intent;
+    private Intent callIntent;
+    private int request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_workout);
         initializeUI();
+        callIntent = getIntent();
+        request = callIntent.getIntExtra("requestcode", 0);
     }
 
     public void initializeUI(){
@@ -39,6 +43,12 @@ public class CreateWorkoutActivity extends AppCompatActivity {
         this.tvSecs         = (TextView) findViewById(R.id.tvSeconds);
         this.tvMins         = (TextView) findViewById(R.id.tvMinutes);
         this.fabSaveWorkout = (FloatingActionButton) findViewById(R.id.fabSaveWorkout);
+
+        if(request == 2){
+            this.edWorkoutName.setText(callIntent.getStringExtra("workoutName"));
+            sbSecs.setProgress(callIntent.getIntExtra("secs", 0));
+            sbMins.setProgress(callIntent.getIntExtra("mins", 0));
+        }
 
         this.sbSecs.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -57,6 +67,7 @@ public class CreateWorkoutActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
 
             }
+
         });
 
         this.sbMins.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -81,19 +92,44 @@ public class CreateWorkoutActivity extends AppCompatActivity {
         this.fabSaveWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(edWorkoutName.getText().toString().isEmpty()){
-                    edWorkoutName.setError("Workout name empty");
+                //refactor later
+                switch(request){
+                    case(3):
+                        if(edWorkoutName.getText().toString().isEmpty()){
+                            edWorkoutName.setError("Workout name empty");
 
-                } else if (sbSecs.getProgress() != 0 || sbMins.getProgress() != 0){
-                    String workoutName = edWorkoutName.getText().toString();
-                    int time = (sbSecs.getProgress() + ((sbMins.getProgress() * 60) - 60));
-                    intent = new Intent();
+                        } else if (sbSecs.getProgress() != 0 || sbMins.getProgress() != 0){
+                            String workoutName = edWorkoutName.getText().toString();
+                            int time = (sbSecs.getProgress() + ((sbMins.getProgress() * 60) - 60));
+                            intent = new Intent();
 
-                    intent.putExtra("workoutName", workoutName);
-                    intent.putExtra("time", time);
-                    setResult(Activity.RESULT_OK, intent);
-                    finish();
+                            intent.putExtra("workoutName", workoutName);
+                            intent.putExtra("time", time);
+                            intent.putExtra("secs", sbSecs.getProgress());
+                            intent.putExtra("mins", sbMins.getProgress());
+                            setResult(Activity.RESULT_OK, intent);
+                            finish();
+                        }
+
+                    case(2):
+                        if(edWorkoutName.getText().toString().isEmpty()){
+                            edWorkoutName.setError("Workout name empty");
+
+                        } else if (sbSecs.getProgress() != 0 || sbMins.getProgress() != 0){
+                            String workoutName = edWorkoutName.getText().toString();
+                            int time = (sbSecs.getProgress() + ((sbMins.getProgress() * 60) - 60));
+                            intent = new Intent();
+
+                            intent.putExtra("workoutName", workoutName);
+                            intent.putExtra("time", time);
+                            intent.putExtra("secs", sbSecs.getProgress());
+                            intent.putExtra("mins", sbMins.getProgress());
+                            setResult(2, intent);
+                            finish();
+                        }
+
                 }
+
             }
         });
     }
