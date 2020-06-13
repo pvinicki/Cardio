@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -93,6 +94,7 @@ public class CreateWorkoutActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //refactor later
+                Toast.makeText(getApplicationContext(), "Request code is: " + request, Toast.LENGTH_LONG ).show();
                 switch(request){
                     case(3):
                         if(edWorkoutName.getText().toString().isEmpty()){

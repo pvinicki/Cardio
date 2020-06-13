@@ -122,6 +122,7 @@ public class CreateRoutineActivity extends AppCompatActivity {
 
         this.fabAddWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
+            //send request code
             public void onClick(View view) {
                 intent = new Intent(CreateRoutineActivity.this, CreateWorkoutActivity.class);
                 startActivityForResult(intent, GET_WORKOUT);
@@ -191,7 +192,7 @@ public class CreateRoutineActivity extends AppCompatActivity {
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
-        intent.putExtra("requestCode", requestCode);
+        intent.putExtra("requestcode", requestCode);
         super.startActivityForResult(intent, requestCode);
     }
 }

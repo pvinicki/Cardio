@@ -20,7 +20,7 @@
             android:layout_width="62dp"
             android:layout_height="57dp"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_add_black_24dp"
+            app:srcCompat="@drawable/ic_add_black_24dp"
             android:layout_gravity="end|bottom" />
 
     </LinearLayout>
