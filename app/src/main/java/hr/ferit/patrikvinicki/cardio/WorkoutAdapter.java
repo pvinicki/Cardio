@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.ViewHolder> {
     private ArrayList<Workout> workouts;
@@ -77,6 +78,18 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.ViewHold
 
     public void setOnItemClickListener(ViewHolder.ClickListener clickListener){
         WorkoutAdapter.clickListener = clickListener;
+    }
+
+    public void remove(int position, String workoutName){
+        Iterator<Workout> iterator = workouts.iterator();
+        while(iterator.hasNext()){
+            Workout workout = iterator.next();
+            if(workout.getName().equals(workoutName)){
+                iterator.remove();
+            }
+        }
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, workouts.size());
     }
 
 }

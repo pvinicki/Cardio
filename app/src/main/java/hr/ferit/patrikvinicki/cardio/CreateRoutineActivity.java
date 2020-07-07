@@ -38,6 +38,8 @@ public class CreateRoutineActivity extends AppCompatActivity {
     private Bundle bundle;
     private Workout editWorkout;
     private AlertDialog.Builder builder;
+    private int request;
+    private Intent callIntent;
     static final int GET_WORKOUT = 3;
     static final int EDIT_WORKOUT = 2;
 
@@ -49,6 +51,8 @@ public class CreateRoutineActivity extends AppCompatActivity {
         //Routine routine = new Routine();
         setContentView(R.layout.activity_create_routine);
         builder = new AlertDialog.Builder(this);
+        callIntent = getIntent();
+        request = callIntent.getIntExtra("requestCode", 0);
         initializeUI();
     }
 
@@ -62,7 +66,17 @@ public class CreateRoutineActivity extends AppCompatActivity {
         this.mItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
 
         //populate adapter from db (serialized routine objects)
-        this.mWorkoutAdapter = new WorkoutAdapter(workouts);
+        if(request == 2){
+            String routineName = callIntent.getStringExtra("routineName");
+            workouts = callIntent.getParcelableArrayListExtra("workouts");
+            for (Workout workout : workouts){
+                Toast.makeText(getApplicationContext(), "Name is " + routineName + " workout name is" + workout.getName() + " workout secs is " + workout.getSecs() + " workout time is " + workout.getTime(), Toast.LENGTH_LONG ).show();
+            }
+            this.edRoutineName.setText(routineName);
+            this.mWorkoutAdapter = new WorkoutAdapter(workouts);
+        } else {
+            this.mWorkoutAdapter = new WorkoutAdapter(workouts);
+        }
 
         this.mWorkoutAdapter.setOnItemClickListener(new WorkoutAdapter.ViewHolder.ClickListener() {
             @Override
@@ -87,7 +101,7 @@ public class CreateRoutineActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onItemLongClick(int position, View v) {
+            public void onItemLongClick(final int position, View v) {
                 final String workoutName = ((TextView) rvWorkouts.findViewHolderForAdapterPosition(position).itemView.findViewById(R.id.tvWorkoutName)).getText().toString();
                 builder.setTitle("Delete selected workout?");
                 builder.setPositiveButton("delete", new DialogInterface.OnClickListener() {
@@ -100,6 +114,8 @@ public class CreateRoutineActivity extends AppCompatActivity {
                                 iterator.remove();
                             }
                         }
+
+                        mWorkoutAdapter.remove(position, workoutName);
                     }
                 });
                 builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -122,7 +138,6 @@ public class CreateRoutineActivity extends AppCompatActivity {
 
         this.fabAddWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
-            //send request code
             public void onClick(View view) {
                 intent = new Intent(CreateRoutineActivity.this, CreateWorkoutActivity.class);
                 startActivityForResult(intent, GET_WORKOUT);
@@ -133,15 +148,28 @@ public class CreateRoutineActivity extends AppCompatActivity {
         this.btnSaveRoutine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(edRoutineName.getText().toString().isEmpty()){
-                    edRoutineName.setError("Routine name empty");
-                } else {
-                    intent = new Intent();
+                switch(request){
+                    case(3):
+                        if(edRoutineName.getText().toString().isEmpty()){
+                            edRoutineName.setError("Routine name empty");
+                        } else {
+                            intent = new Intent();
+                            intent.putExtra("routineName",edRoutineName.getText().toString());
+                            intent.putParcelableArrayListExtra("workouts", workouts);
+                            setResult(Activity.RESULT_OK, intent);
+                            finish();
+                        }
 
-                    intent.putExtra("routineName",edRoutineName.getText().toString());
-                    intent.putParcelableArrayListExtra("workouts", workouts);
-                    setResult(Activity.RESULT_OK, intent);
-                    finish();
+                    case(2):
+                        if(edRoutineName.getText().toString().isEmpty()){
+                            edRoutineName.setError("Routine name empty");
+                        } else {
+                            intent = new Intent();
+                            intent.putExtra("routineName",edRoutineName.getText().toString());
+                            intent.putParcelableArrayListExtra("workouts", workouts);
+                            setResult(2, intent);
+                            finish();
+                        }
                 }
             }
         });
@@ -159,8 +187,9 @@ public class CreateRoutineActivity extends AppCompatActivity {
                 time = data.getIntExtra("time", 1);
                 secs = data.getIntExtra("secs", 0);
                 mins = data.getIntExtra("mins", 0);
-
-                workouts.add(new Workout(name, time, secs, mins));
+                Workout workout = new Workout(name, time, secs, mins);
+                Toast.makeText(getApplicationContext()," workout secs is " + workout.getSecs(), Toast.LENGTH_LONG ).show();
+                workouts.add(workout);
                 mWorkoutAdapter = new WorkoutAdapter(workouts);
                 rvWorkouts.setAdapter(mWorkoutAdapter);
 
@@ -179,11 +208,14 @@ public class CreateRoutineActivity extends AppCompatActivity {
                 while(iterator.hasNext()){
                     Workout workout = iterator.next();
                     if(workout.getName().equals(editWorkout.getName())){
-                        iterator.remove();
+                        workout.setName(name);
+                        workout.setTime(time);
+                        workout.setSecs(secs);
+                        workout.setMins(mins);
                     }
                 }
+
                 //add edited workout
-                workouts.add(new Workout(name, time, secs, mins));
                 mWorkoutAdapter = new WorkoutAdapter(workouts);
                 rvWorkouts.setAdapter(mWorkoutAdapter);
 
@@ -192,7 +224,7 @@ public class CreateRoutineActivity extends AppCompatActivity {
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
-        intent.putExtra("requestcode", requestCode);
+        intent.putExtra("requestCode", requestCode);
         super.startActivityForResult(intent, requestCode);
     }
 }

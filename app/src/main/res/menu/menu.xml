@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/profile"
+        android:icon="@drawable/ic_portrait_black_24dp"
+        android:id="@+id/profileItem"/>
+
+    <item android:title="@string/routines"
+        android:icon="@drawable/ic_fitness_center_black_24dp"
+        android:id="@+id/routinesItem"/>
+
+    <item android:title="statistics"
+        android:id="@+id/statisticsItem"
+        android:icon="@drawable/ic_equalizer_black_24dp"/>
+
+    <item android:title="logout"
+        android:id="@+id/logoutItem"
+        android:icon="@drawable/ic_remove_circle_outline_black_24dp"/>
+</menu>

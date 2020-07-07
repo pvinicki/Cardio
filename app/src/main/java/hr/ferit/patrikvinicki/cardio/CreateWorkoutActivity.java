@@ -31,9 +31,9 @@ public class CreateWorkoutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_workout);
-        initializeUI();
         callIntent = getIntent();
-        request = callIntent.getIntExtra("requestcode", 0);
+        request = callIntent.getIntExtra("requestCode", 0);
+        initializeUI();
     }
 
     public void initializeUI(){
@@ -46,9 +46,15 @@ public class CreateWorkoutActivity extends AppCompatActivity {
         this.fabSaveWorkout = (FloatingActionButton) findViewById(R.id.fabSaveWorkout);
 
         if(request == 2){
+            int secs = callIntent.getIntExtra("secs", 0);
+            int mins = callIntent.getIntExtra("mins", 0);
+            String seconds = secs + " s";
+            String minutes = mins + " m";
             this.edWorkoutName.setText(callIntent.getStringExtra("workoutName"));
             sbSecs.setProgress(callIntent.getIntExtra("secs", 0));
+            tvSecs.setText(seconds);
             sbMins.setProgress(callIntent.getIntExtra("mins", 0));
+            tvMins.setText(minutes);
         }
 
         this.sbSecs.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -94,7 +100,6 @@ public class CreateWorkoutActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //refactor later
-                Toast.makeText(getApplicationContext(), "Request code is: " + request, Toast.LENGTH_LONG ).show();
                 switch(request){
                     case(3):
                         if(edWorkoutName.getText().toString().isEmpty()){

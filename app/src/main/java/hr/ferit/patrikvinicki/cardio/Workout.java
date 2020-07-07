@@ -3,9 +3,10 @@ package hr.ferit.patrikvinicki.cardio;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
 import java.sql.Time;
 
-public class Workout implements Parcelable {
+public class Workout implements Parcelable, Serializable {
     private String name;
     private int time;
     private int secs;
@@ -74,10 +75,14 @@ public class Workout implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(name);
         parcel.writeInt(time);
+        parcel.writeInt(secs);
+        parcel.writeInt(mins);
     }
 
     private Workout(Parcel in){
         this.name = in.readString();
         this.time = in.readInt();
+        this.secs = in.readInt();
+        this.mins = in.readInt();
     }
 }

@@ -4,13 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -29,25 +32,38 @@ public class StartRoutineActivity extends AppCompatActivity {
     private FloatingActionButton fabStartPause;
     private boolean inProgress;
     private boolean wasPaused;
+    private DBhandler db;
+    private int calories;
+    private int time;
+    SharedPreferences prefs;
+    private int counter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_routine);
-        initializeUI();
         inProgress = false;
         wasPaused = false;
+        prefs = getApplicationContext().getSharedPreferences("session", Context.MODE_PRIVATE);
+        db = new DBhandler(this, "cardio.db", null, 3);
         final MediaPlayer mp = MediaPlayer.create(this, R.raw.finished);
         intent = getIntent();
+        initializeUI();
     }
 
     public void initializeUI(){
         this.tvRoutineName = (TextView) findViewById(R.id.tvRoutineName);
         this.tvWorkoutName = (TextView) findViewById(R.id.tvWorkoutName);
         this.tvTimer       = (TextView) findViewById(R.id.tvTimer);
+        this.fabStartPause = (FloatingActionButton) findViewById(R.id.fabStartPauseWorkout);
 
         workouts = intent.getParcelableArrayListExtra("workouts");
         this.tvRoutineName.setText(intent.getStringExtra("routineName"));
+        Workout workout = workouts.get(0);
+        this.tvWorkoutName.setText(workout.getName());
+        String time = workout.getTime() + " s";
+        this.tvTimer.setText(time);
+
 
         fabStartPause.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +80,7 @@ public class StartRoutineActivity extends AppCompatActivity {
                 } else {
                     fabStartPause.setImageDrawable(ContextCompat.getDrawable(StartRoutineActivity.this, R.drawable.ic_play_arrow_black_48dp));
                     wasPaused = true;
+                    inProgress = false;
                     cTimer.cancel();
                 }
 
@@ -72,11 +89,21 @@ public class StartRoutineActivity extends AppCompatActivity {
     }
 
     void beginWorkout(){
-        for(Workout workout : workouts){
+        if(counter != workouts.size()) {
+            Workout workout = workouts.get(counter);
             String time = workout.getTime() + " s";
             this.tvWorkoutName.setText(workout.getName());
             this.tvTimer.setText(time);
             startTimer(workout.getTime());
+        } else {
+            Toast.makeText(getApplicationContext(), "Congratulations! You completed the workout", Toast.LENGTH_LONG ).show();
+            for(Workout workout : workouts){
+                time += workout.getTime();
+            }
+            calories = (int)(((time/60)*(5*3.5*80))/200);
+            db.updateStats(prefs.getString("username", "null"), calories, time);
+            //show some dialog congratulations, pressing ok takes user to main activity
+
         }
     }
 
@@ -91,6 +118,8 @@ public class StartRoutineActivity extends AppCompatActivity {
                 //play sound so user knows workout finished
                 final MediaPlayer mp = MediaPlayer.create(StartRoutineActivity.this, R.raw.finished);
                 mp.start();
+                counter += 1;
+                beginWorkout();
             }
         };
         cTimer.start();

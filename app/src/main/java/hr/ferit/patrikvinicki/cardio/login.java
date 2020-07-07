@@ -20,8 +20,8 @@ public class login extends AppCompatActivity {
     private Button btnLogin;
     private TextView linkRegister;
     private DBhandler db;
-    private SharedPreferences.Editor editor;
-    private SharedPreferences prefs;
+    SharedPreferences.Editor editor;
+    SharedPreferences prefs;
     private Intent intent;
 
 
@@ -29,8 +29,9 @@ public class login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        prefs = getSharedPreferences("session", MODE_PRIVATE);
-        db = new DBhandler(this, null, null, 2);
+        prefs = getApplicationContext().getSharedPreferences("session", MODE_PRIVATE);
+        db = new DBhandler(this, "cardio.db", null, 3);
+        Toast.makeText(getApplicationContext(), "loggedin: " + prefs.getInt("loggedin", 0) + "username is: " + prefs.getString("username", "null") , Toast.LENGTH_LONG ).show();
         initializeUI();
     }
 

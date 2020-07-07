@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHolder> {
     private ArrayList<Routine> routines;
@@ -80,5 +81,17 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHold
 
     public void setOnItemClickListener(ViewHolder.ClickListener clickListener){
         RoutineAdapter.clickListener = clickListener;
+    }
+
+    public void remove(int position, String routineName){
+        Iterator<Routine> iterator = routines.iterator();
+        while(iterator.hasNext()){
+            Routine routine = iterator.next();
+            if(routine.getName().equals(routineName)){
+                iterator.remove();
+            }
+        }
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, routines.size());
     }
 }

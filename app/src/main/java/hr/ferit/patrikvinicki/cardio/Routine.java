@@ -1,9 +1,10 @@
 package hr.ferit.patrikvinicki.cardio;
 
+import java.io.Serializable;
 import java.sql.Time;
 import java.util.ArrayList;
 
-public class Routine {
+public class Routine implements Serializable {
     private String name;
     private ArrayList<Workout> workouts;
     int time;

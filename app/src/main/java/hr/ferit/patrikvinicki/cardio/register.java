@@ -22,8 +22,8 @@ public class register extends AppCompatActivity {
     private Button   register;
     private TextView linkLogin;
     private DBhandler db;
-    private SharedPreferences.Editor editor;
-    private SharedPreferences prefs;
+    SharedPreferences.Editor editor;
+    SharedPreferences prefs;
     private Intent intent;
 
 
@@ -32,8 +32,8 @@ public class register extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        prefs = getSharedPreferences("session", MODE_PRIVATE);
-        db = new DBhandler(this, null, null, 2);
+        prefs = getApplicationContext().getSharedPreferences("session", MODE_PRIVATE);
+        db = new DBhandler(this, "cardio.db", null, 3);
         initializeUI();
     }
 
@@ -84,6 +84,7 @@ public class register extends AppCompatActivity {
 
             intent = new Intent(register.this, MainActivity.class);
             startActivity(intent);
+            Toast.makeText(getApplicationContext(), "Registered " + "loggedin: " + prefs.getInt("loggedin", 0) + "username is: " + prefs.getString("username", "null"), Toast.LENGTH_LONG ).show();
         } else {
             Toast.makeText(getApplicationContext(), "Username already exists!", Toast.LENGTH_LONG ).show();
         }
