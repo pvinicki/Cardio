@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
@@ -20,6 +22,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class StartRoutineActivity extends AppCompatActivity {
     private Intent intent;
@@ -37,6 +40,10 @@ public class StartRoutineActivity extends AppCompatActivity {
     private int time;
     SharedPreferences prefs;
     private int counter;
+    private MediaPlayer mp;
+    private MediaPlayer countdown;
+    private MediaPlayer routineFinished;
+    private android.app.AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +52,11 @@ public class StartRoutineActivity extends AppCompatActivity {
         inProgress = false;
         wasPaused = false;
         prefs = getApplicationContext().getSharedPreferences("session", Context.MODE_PRIVATE);
+        builder = new AlertDialog.Builder(this);
         db = new DBhandler(this, "cardio.db", null, 3);
-        final MediaPlayer mp = MediaPlayer.create(this, R.raw.finished);
+        mp = MediaPlayer.create(this, R.raw.finished);
+        countdown = MediaPlayer.create(this, R.raw.countdown);
+        routineFinished = MediaPlayer.create(this, R.raw.routinefinished);
         intent = getIntent();
         initializeUI();
     }
@@ -72,7 +82,7 @@ public class StartRoutineActivity extends AppCompatActivity {
                     fabStartPause.setImageDrawable(ContextCompat.getDrawable(StartRoutineActivity.this, R.drawable.ic_pause_black_24dp));
                     inProgress = true;
                     if (wasPaused){
-                        startTimer(millisLeft);
+                        startTimer(millisLeft/1000);
                     } else{
                         beginWorkout();
                     }
@@ -96,14 +106,26 @@ public class StartRoutineActivity extends AppCompatActivity {
             this.tvTimer.setText(time);
             startTimer(workout.getTime());
         } else {
-            Toast.makeText(getApplicationContext(), "Congratulations! You completed the workout", Toast.LENGTH_LONG ).show();
             for(Workout workout : workouts){
                 time += workout.getTime();
             }
             calories = (int)(((time/60)*(5*3.5*80))/200);
             db.updateStats(prefs.getString("username", "null"), calories, time);
-            //show some dialog congratulations, pressing ok takes user to main activity
+            routineFinished.start();
 
+            builder.setTitle("Congratulations!");
+            builder.setMessage("You burned " + calories + " calories");
+            builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    intent = new Intent(StartRoutineActivity.this, MainActivity.class);
+
+                    startActivity(intent);
+                }
+            });
+
+            AlertDialog alert = builder.create();
+            alert.show();
         }
     }
 
@@ -112,12 +134,16 @@ public class StartRoutineActivity extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 String currentTime = String.valueOf(millisUntilFinished / 1000) + " s";
                 millisLeft = (int) millisUntilFinished;
+                if(millisLeft <= 3000){
+                    countdown.start();
+                }
                 tvTimer.setText(currentTime);
             }
             public void onFinish() {
                 //play sound so user knows workout finished
-                final MediaPlayer mp = MediaPlayer.create(StartRoutineActivity.this, R.raw.finished);
-                mp.start();
+                if(counter != workouts.size()){
+                    mp.start();
+                }
                 counter += 1;
                 beginWorkout();
             }

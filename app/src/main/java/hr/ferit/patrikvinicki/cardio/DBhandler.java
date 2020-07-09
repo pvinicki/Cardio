@@ -56,7 +56,7 @@ public class DBhandler extends SQLiteOpenHelper {
                 values.put("numWorkouts", cursor.getInt(0) + 1);
                 values.put("calories", cursor.getInt(1) + calories);
                 values.put("timeWorkouts", cursor.getInt(2) + time);
-                db.update("ROUTINES", values, "user = " + "'" + user + "'", null);
+                db.update("STATS", values, "user = " + "'" + user + "'", null);
                 db.close();
             }
         } else {

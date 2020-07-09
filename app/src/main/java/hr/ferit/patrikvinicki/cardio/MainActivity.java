@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navView;
+    private TextView username;
 
 
     @Override
@@ -59,13 +60,14 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
 
+        View headerView = navView.getHeaderView(0);
+        this.username = headerView.findViewById(R.id.tvUsername);
+        username.setText(prefs.getString("username", "null"));
+
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.profileItem:
-                        break;
-
                     case R.id.routinesItem:
                         intent = new Intent(MainActivity.this, RoutinesActivity.class);
                         startActivity(intent);

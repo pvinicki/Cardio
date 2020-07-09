@@ -8,4 +8,5 @@
     <string name="cardio">CARDIO</string>
     <string name="calories_nburned">Calories\nBurned</string>
     <string name="workouts_ncompleted">Workouts\nCompleted</string>
+    <string name="current_workout">Current Workout:</string>
 </resources>
